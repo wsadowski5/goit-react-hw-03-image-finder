@@ -77,14 +77,11 @@ export class App extends Component {
     return (
       <div>
         <Searchbar handleSearch={this.handleSubmitForm} />
-        {this.state.isLoading ? (
-          <Loader />
-        ) : (
-          <ImageGallery
-            data={this.state.images}
-            onClick={this.handleOpenModal}
-          />
-        )}
+
+        <ImageGallery data={this.state.images} onClick={this.handleOpenModal} />
+
+        {this.state.isLoading ? <Loader /> : null}
+
         {this.state.totalHits > this.state.perPage && (
           <Button onClick={this.loadMore} />
         )}
