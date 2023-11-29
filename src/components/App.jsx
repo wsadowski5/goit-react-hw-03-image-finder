@@ -10,44 +10,52 @@ export class App extends Component {
   state = {
     images: [],
     isLoading: false,
-    pageNumber: null,
+    pageNumber: 1,
     query: '',
     totalHits: null,
-    perPage: null,
+    perPage: 12,
     isModalOpen: false,
     modalImgURL: '',
   };
 
-  fetchData = async (query, pageNumber, perPage) => {
-    try {
-      this.setState({ isLoading: true });
-      const galleryItems = await getItems(query, pageNumber, perPage);
-      this.setState({
-        images: galleryItems.hits,
-        perPage: perPage,
-        pageNumber: pageNumber,
-        query: query,
-        totalHits: galleryItems.totalHits,
-      });
-    } catch (error) {
-      console.error('ERROR:', error);
-      alert(error);
-      throw error;
-    } finally {
-      this.setState({ isLoading: false });
-    }
+  handleSubmitForm = event => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const inputValue = event.target[1].value;
+    const pageNumber = 1;
+    this.setState({ images: [], query: inputValue, pageNumber: pageNumber });
+    form.reset();
   };
 
-  loadMore = async () => {
-    const moreItems = await getItems(
-      this.state.query,
-      this.state.pageNumber + 1,
-      this.state.perPage
-    );
-    this.setState({
-      images: [...this.state.images, ...moreItems.hits],
-      pageNumber: this.state.pageNumber + 1,
-    });
+  async componentDidUpdate(prevProps, prevState) {
+    if (
+      prevState.pageNumber !== this.state.pageNumber ||
+      prevState.query !== this.state.query
+    ) {
+      this.setState({ isLoading: true });
+      try {
+        const galleryItems = await getItems(
+          this.state.query,
+          this.state.pageNumber,
+          this.state.perPage
+        );
+
+        this.setState(({ images }) => ({
+          images: [...images, ...galleryItems.hits],
+          totalHits: galleryItems.totalHits,
+        }));
+      } catch (error) {
+        console.error('ERROR:', error);
+        alert(error);
+        throw error;
+      } finally {
+        this.setState({ isLoading: false });
+      }
+    }
+  }
+
+  loadMore = () => {
+    this.setState(({ pageNumber }) => ({ pageNumber: pageNumber + 1 }));
   };
 
   handleOpenModal = imgURL => {
@@ -68,7 +76,7 @@ export class App extends Component {
   render() {
     return (
       <div>
-        <Searchbar handleSearch={this.fetchData} />
+        <Searchbar handleSearch={this.handleSubmitForm} />
         {this.state.isLoading ? (
           <Loader />
         ) : (

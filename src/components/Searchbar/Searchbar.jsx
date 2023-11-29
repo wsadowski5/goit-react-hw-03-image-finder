@@ -4,23 +4,18 @@ import PropTypes from "prop-types"
 
 export class Searchbar extends Component {
 
-    handleSubmit = event => {
-        event.preventDefault()
-        const inputValue = event.target[1].value;
-        const perPage = 12;
-        const pageNumber = 1;
-        this.props.handleSearch(inputValue,  pageNumber, perPage) //fetchData
-    }
+   
   render() {
     return (
       <div>
         <header className={css.searchbar}>
-          <form className={css.form} onSubmit={this.handleSubmit}>
+          <form className={css.form} onSubmit={this.props.handleSearch}>
             <button type="submit" className={css.button}>
               <span className={css.label}>Search</span>
             </button>
 
             <input
+            name='input'
               className={css.input}
               type="text"
               autoComplete="off"
